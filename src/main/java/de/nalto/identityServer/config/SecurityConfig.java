@@ -3,6 +3,7 @@ package de.nalto.identityServer.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,7 +27,7 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain registerFilterChain(HttpSecurity http) throws Exception {
         http
-            .securityMatcher("/register", "/login", "/error")
+            .securityMatcher("/register", "/error")
             .authorizeHttpRequests((auth) -> auth
                     .anyRequest().permitAll());
         return http.build();
@@ -38,10 +39,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         "/user/**",
+                        "/login",
                         "/users/**")
                 .permitAll()
                 .anyRequest().authenticated())
-            .formLogin(login -> login.loginPage("/login"))
+            .formLogin(Customizer.withDefaults())
             .logout(logout -> logout.logoutUrl("/logout"));
 
         return http.build();

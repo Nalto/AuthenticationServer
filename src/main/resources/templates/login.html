@@ -2,27 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="#{login}"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-    <form method="post" th:action="@{/login}">
-        <h2 th:text="#{login}"></h2>
+    <div class="login-card">
+        <div th:if="${param.error}" class="error">
+            <p>invalid.username.or.password</p>
+        </div>
+        <form method="post" th:action="@{/login}">
+            <h2 th:text="#{login}"></h2>
 
-        <label for="username" th:text="#{username}"></label>
-        <input type="text"
-               name="username"
-               id="username"
-               th:placeholder="#{username}"/>
+            <label for="username" th:text="#{username}"></label>
+            <input type="text"
+                   name="username"
+                   id="username"
+                   th:placeholder="#{username}"/>
 
-        <label for="password" th:text="#{password}"></label>
-        <input type="password"
-               name="password"
-               id="password"
-               th:placeholder="#{password}"/>
+            <label for="password" th:text="#{password}"></label>
+            <input type="password"
+                   name="password"
+                   id="password"
+                   th:placeholder="#{password}"/>
 
-        <button th:text="#{login}"></button>
+            <button type="submit" th:text="#{login}"></button>
 
-        <a th:href="@{/register}" th:text="#{login}"></a>
-    </form>
+            <a th:href="@{/register}" th:text="#{register}"></a>
+        </form>
+    </div>
 </body>
 </html>

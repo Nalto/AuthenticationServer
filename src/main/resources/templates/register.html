@@ -1,17 +1,21 @@
-<form method="post" th:action="@{/register}">
-    <h2 th:text="#{register}"></h2>
+<link rel="stylesheet" th:href="@{/css/style.css}">
+<div class="login-card">
+    <form method="post" th:action="@{/register}">
+        <h2 th:text="#{register}"></h2>
 
-    <label for="username" th:text="#{username}"></label>
-    <input type="text"
-           name="username"
-           id="username"
-           th:placeholder="#{username}"/>
+        <label for="username" th:text="#{username}"></label>
+        <input type="text"
+               name="username"
+               id="username"
+               th:placeholder="#{username}"/>
 
-    <label for="password" th:text="#{password}"></label>
-    <input type="password"
-           name="password"
-           id="password"
-           th:placeholder="#{password}"/>
+        <label for="password" th:text="#{password}"></label>
+        <input type="password"
+               name="password"
+               id="password"
+               th:placeholder="#{password}"/>
 
-    <button th:text="#{register}"></button>
-</form>
+        <button th:text="#{register}"></button>
+        <a th:href="@{/login}" th:text="#{backToLogin}"></a>
+    </form>
+</div>

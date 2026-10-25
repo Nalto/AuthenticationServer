@@ -1,0 +1,104 @@
+:root {
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #52606d;
+    --border: #d9e2ec;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --error: #b91c1c;
+    --error-bg: #fef2f2;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 360px;
+    padding: 2rem 1.75rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.error {
+    margin: 0 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 8px;
+    background: var(--error-bg);
+    color: var(--error);
+    font-size: 0.9rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+h2 {
+    margin: 0 0 1rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+label {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+input {
+    margin-bottom: 0.7rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: 2px solid rgba(37, 99, 235, 0.25);
+    border-color: var(--accent);
+}
+
+button {
+    margin-top: 0.35rem;
+    padding: 0.75rem 0.9rem;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--accent-hover);
+}
+
+a {
+    margin-top: 0.9rem;
+    text-align: center;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+a:hover {
+    text-decoration: underline;
+}

@@ -1,16 +1,17 @@
 package de.nalto.identityServer.persistence.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.Assert;
 
-import java.util.Collection;
-import java.util.List;
+import java.io.Serializable;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
-public class User implements UserDetails, CredentialsContainer {
+public class User implements ExtendedUserDetails, CredentialsContainer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +24,20 @@ public class User implements UserDetails, CredentialsContainer {
     private boolean enabled;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "username")
     private Collection<Authority> authorities;
+
+    public User(String username, @Nullable String password, boolean enabled, boolean accountNonExpired,
+                boolean credentialsNonExpired, boolean accountNonLocked,
+                Collection<? extends GrantedAuthority> authorities) {
+        Assert.isTrue(username != null && !username.isEmpty(), "Cannot pass null or empty values to constructor");
+        this.username = username;
+        this.password = password;
+        this.enabled = enabled;
+        this.authorities = Collections.unmodifiableSet(sortAuthorities(authorities));
+    }
+
+    public User() {
+
+    }
 
     public Long getId() {
         return id;
@@ -38,17 +53,17 @@ public class User implements UserDetails, CredentialsContainer {
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return ExtendedUserDetails.super.isAccountNonExpired();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return ExtendedUserDetails.super.isAccountNonLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return ExtendedUserDetails.super.isCredentialsNonExpired();
     }
 
     public void setUsername(String username) {
@@ -84,5 +99,39 @@ public class User implements UserDetails, CredentialsContainer {
     public void eraseCredentials() {
         this.password = null;
         // TODO: also erase email
+    }
+
+    private static SortedSet<Authority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        Assert.notNull(authorities, "Cannot pass a null GrantedAuthority collection");
+        // Ensure array iteration order is predictable (as per
+        // UserDetails.getAuthorities() contract and SEC-717)
+        SortedSet<Authority> sortedAuthorities = new TreeSet<>(new AuthorityComparator());
+        for (GrantedAuthority grantedAuthority : authorities) {
+            Assert.notNull(grantedAuthority, "GrantedAuthority list cannot contain any null elements");
+            Authority authority = new Authority();
+            authority.setAuthority(grantedAuthority.getAuthority());
+            sortedAuthorities.add(authority);
+        }
+        return sortedAuthorities;
+    }
+
+    private static class AuthorityComparator implements Comparator<GrantedAuthority>, Serializable {
+
+        private static final long serialVersionUID = 620L;
+
+        @Override
+        public int compare(GrantedAuthority g1, GrantedAuthority g2) {
+            // Neither should ever be null as each entry is checked before adding it to
+            // the set. If the authority is null, it is a custom authority and should
+            // precede others.
+            if (g2.getAuthority() == null) {
+                return -1;
+            }
+            if (g1.getAuthority() == null) {
+                return 1;
+            }
+            return g1.getAuthority().compareTo(g2.getAuthority());
+        }
+
     }
 }

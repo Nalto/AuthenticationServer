@@ -1,5 +1,6 @@
 package de.nalto.identityServer.services;
 
+import de.nalto.identityServer.dto.UserDetails;
 import de.nalto.identityServer.dto.UserRegistration;
 import de.nalto.identityServer.persistence.model.Authority;
 import de.nalto.identityServer.persistence.model.User;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -36,5 +38,10 @@ public class UserService {
         user.setAuthorities(List.of(authority));
 
         userRepository.save(user);
+    }
+
+    public UserDetails getUser(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.map(value -> new UserDetails(value.getId(), value.getUsername())).orElse(null);
     }
 }

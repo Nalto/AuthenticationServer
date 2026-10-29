@@ -1,10 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${user.username()}"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+    <div class="login-card">
+        <h2 th:text="#{profile}"></h2>
 
+        <p class="error" th:if="${error}" th:text="#{${error}}" role="alert"></p>
+        <p class="success" th:if="${success}" th:text="#{${success}}" role="status"></p>
+
+        <div class="info-row">
+            <div>
+                <span class="info-label" th:text="#{username}"></span>
+                <span class="info-value" th:text="${user.username()}"></span>
+            </div>
+            <button type="button" class="secondary edit-button" th:if="${editable}"
+                    data-target="username-form" th:text="#{edit}"></button>
+        </div>
+        <form method="post" th:action="@{/user/current/username}" id="username-form" class="edit-form"
+              th:if="${editable}" hidden novalidate>
+            <label for="username" th:text="#{newUsername}"></label>
+            <input type="text"
+                   name="username"
+                   id="username"
+                   th:value="${user.username()}"
+                   th:attr="data-error=#{invalid.username}"/>
+            <p class="error" id="username-error" role="alert" hidden></p>
+            <p class="hint" th:text="#{username.change.hint}"></p>
+            <div class="edit-actions">
+                <button type="submit" th:text="#{save}"></button>
+                <button type="button" class="secondary cancel-button" th:text="#{cancel}"></button>
+            </div>
+        </form>
+
+        <div class="info-row">
+            <div>
+                <span class="info-label" th:text="#{email}"></span>
+                <span class="info-value" th:text="${user.email()}"></span>
+            </div>
+            <button type="button" class="secondary edit-button" th:if="${editable}"
+                    data-target="email-form" th:text="#{edit}"></button>
+        </div>
+        <form method="post" th:action="@{/user/current/email}" id="email-form" class="edit-form"
+              th:if="${editable}" hidden novalidate>
+            <label for="email" th:text="#{newEmail}"></label>
+            <input type="text"
+                   name="email"
+                   id="email"
+                   th:value="${user.email()}"
+                   th:attr="data-error=#{invalid.email}"/>
+            <p class="error" id="email-error" role="alert" hidden></p>
+            <div class="edit-actions">
+                <button type="submit" th:text="#{save}"></button>
+                <button type="button" class="secondary cancel-button" th:text="#{cancel}"></button>
+            </div>
+        </form>
+
+        <div class="info-row" th:if="${editable}">
+            <div>
+                <span class="info-label" th:text="#{password}"></span>
+                <span class="info-value">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</span>
+            </div>
+            <button type="button" class="secondary edit-button"
+                    data-target="password-form" th:text="#{edit}"></button>
+        </div>
+        <form method="post" th:action="@{/user/current/password}" id="password-form" class="edit-form"
+              th:if="${editable}" hidden>
+            <label for="currentPassword" th:text="#{currentPassword}"></label>
+            <input type="password"
+                   name="currentPassword"
+                   id="currentPassword"
+                   autocomplete="current-password"
+                   required/>
+            <label for="newPassword" th:text="#{newPassword}"></label>
+            <input type="password"
+                   name="newPassword"
+                   id="newPassword"
+                   autocomplete="new-password"
+                   required/>
+            <div class="edit-actions">
+                <button type="submit" th:text="#{save}"></button>
+                <button type="button" class="secondary cancel-button" th:text="#{cancel}"></button>
+            </div>
+        </form>
+
+        <form method="post" th:action="@{/logout}" th:if="${editable}">
+            <button type="submit" class="secondary" th:text="#{logout}"></button>
+        </form>
+    </div>
+
+    <script th:if="${editable}">
+        (function () {
+            var patterns = {
+                email: /^[a-zA-Z0-9_!#$%&'*+\/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/,
+                username: /^[a-zA-Z0-9_]+$/
+            };
+
+            function closeAll() {
+                document.querySelectorAll('.edit-form').forEach(function (form) {
+                    form.hidden = true;
+                });
+            }
+
+            document.querySelectorAll('.edit-button').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    closeAll();
+                    var form = document.getElementById(button.getAttribute('data-target'));
+                    form.hidden = false;
+                    var field = form.querySelector('input');
+                    field.focus();
+                    field.select();
+                });
+            });
+
+            document.querySelectorAll('.cancel-button').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var form = button.closest('form');
+                    form.reset();
+                    var error = form.querySelector('.error');
+                    if (error) {
+                        error.hidden = true;
+                    }
+                    form.hidden = true;
+                });
+            });
+
+            ['email', 'username'].forEach(function (name) {
+                var input = document.getElementById(name);
+                var error = document.getElementById(name + '-error');
+                input.form.addEventListener('submit', function (event) {
+                    var valid = patterns[name].test(input.value);
+                    error.textContent = valid ? '' : input.getAttribute('data-error');
+                    error.hidden = valid;
+                    if (!valid) {
+                        event.preventDefault();
+                        input.focus();
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

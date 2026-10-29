@@ -22,6 +22,8 @@ public class User implements ExtendedUserDetails, CredentialsContainer {
     private String password;
     @Column(nullable = false)
     private boolean enabled;
+    @Column(unique = true, nullable = false)
+    private String email;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "username")
     private Collection<Authority> authorities;
 
@@ -95,10 +97,18 @@ public class User implements ExtendedUserDetails, CredentialsContainer {
         this.enabled = enabled;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public void eraseCredentials() {
         this.password = null;
-        // TODO: also erase email
+        this.email = null;
     }
 
     private static SortedSet<Authority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {

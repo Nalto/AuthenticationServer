@@ -1,13 +1,23 @@
 <link rel="stylesheet" th:href="@{/css/style.css}">
 <div class="login-card">
-    <form method="post" th:action="@{/register}">
+    <form method="post" th:action="@{/register}" id="register-form" novalidate>
         <h2 th:text="#{register}"></h2>
+
+        <label for="email" th:text="#{email}"></label>
+        <input type="text"
+               name="email"
+               id="email"
+               th:placeholder="#{email}"
+               th:attr="data-error=#{invalid.email}"/>
+        <p class="error" id="email-error" role="alert" hidden></p>
 
         <label for="username" th:text="#{username}"></label>
         <input type="text"
                name="username"
                id="username"
-               th:placeholder="#{username}"/>
+               th:placeholder="#{username}"
+               th:attr="data-error=#{invalid.username}"/>
+        <p class="error" id="username-error" role="alert" hidden></p>
 
         <label for="password" th:text="#{password}"></label>
         <input type="password"
@@ -15,7 +25,53 @@
                id="password"
                th:placeholder="#{password}"/>
 
-        <button th:text="#{register}"></button>
+        <button id="register-button" th:text="#{register}"></button>
         <a th:href="@{/login}" th:text="#{backToLogin}"></a>
     </form>
 </div>
+<script>
+    (function () {
+        var emailPattern = /^[a-zA-Z0-9_!#$%&'*+\/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$/;
+        var usernamePattern = /^[a-zA-Z0-9_]+$/;
+
+        var form = document.getElementById('register-form');
+        var email = document.getElementById('email');
+        var username = document.getElementById('username');
+        var registerButton = document.getElementById('register-button');
+
+        function updateRegisterButton() {
+            registerButton.disabled = !(emailPattern.test(email.value) && usernamePattern.test(username.value));
+        }
+
+        function check(input, pattern) {
+            var error = document.getElementById(input.id + '-error');
+            var valid = pattern.test(input.value);
+            error.textContent = valid ? '' : input.getAttribute('data-error');
+            error.hidden = valid;
+            input.setAttribute('aria-invalid', String(!valid));
+            return valid;
+        }
+
+        email.addEventListener('blur', function () { check(email, emailPattern); });
+        username.addEventListener('blur', function () { check(username, usernamePattern); });
+        email.addEventListener('input', function () {
+            if (!document.getElementById('email-error').hidden) check(email, emailPattern);
+            updateRegisterButton();
+        });
+        username.addEventListener('input', function () {
+            if (!document.getElementById('username-error').hidden) check(username, usernamePattern);
+            updateRegisterButton();
+        });
+
+        form.addEventListener('submit', function (event) {
+            var emailValid = check(email, emailPattern);
+            var usernameValid = check(username, usernamePattern);
+            if (!emailValid || !usernameValid) {
+                event.preventDefault();
+                (emailValid ? username : email).focus();
+            }
+        });
+
+        updateRegisterButton();
+    })();
+</script>
